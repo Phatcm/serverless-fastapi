@@ -9,7 +9,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 
 app = FastAPI()
-handler = Mangum(app)
+lambda_handler = Mangum(app)
 
 @app.get("/")
 def get_root():

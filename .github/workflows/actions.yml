@@ -9,19 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3 # This action checks out for the latest code/branch that triggered this job
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 16
 
     - name: Set up Python 3.9
       uses: actions/setup-python@v4
       with:
         python-version: 3.9
-
-    - name: Install npm
-      run: |
-        npm cache clean --force
-        npm install --legacy-peer-deps  
  
     - name: Create layers
       run: |
@@ -35,10 +27,22 @@ jobs:
         pip install --target ./fastApi/python/  google-auth-httplib2
         pip install --target ./fastApi/python/  pydantic
  
-    - name: Deploy dev env
-      run: |
-        npm cache clean --force
-        npx serverless deploy --stage dev --region ap-northeast-1 --aws-s3-accelerate --verbose
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.0.0
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Validate
+      run: terraform validate
+
+    - name: Terraform Plan
+      run: terraform plan
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
