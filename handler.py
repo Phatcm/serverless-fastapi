@@ -15,7 +15,7 @@ handler = Mangum(app)
 def get_root():
     try:
         result = {
-            "hello": "world"
+            "hello": "buddy"
         }
 
         return buildResponse(200, result)
